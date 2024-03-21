@@ -6,15 +6,17 @@
 
 #define MAX_COMMAND_LENGTH 100
 #define MAX_ARGS 10
+#define TRUE 1
 
 int main() {
     char command[MAX_COMMAND_LENGTH];
     char *args[MAX_ARGS];
     char *token;
-    int should_run = 1;
+    char cwd[1024];
 
-    while (should_run) {
-        printf("shell> ");
+    while (TRUE) {
+        getcwd(cwd, sizeof(cwd));
+        printf("\n%s$ ", cwd);
         fflush(stdout);
 
         // Ler o comando digitado pelo usuário
@@ -34,15 +36,13 @@ int main() {
         args[arg_count] = NULL; // Adicionar NULL no final do array de argumentos
 
         if (strcmp(args[0], "exit") == 0) {
-            should_run = 0;
+          break;
         } else {
             if (strcmp(args[0], "cd") == 0) {
                 if (arg_count == 1) {
-                    fprintf(stderr, "Usage: cd <directory>\n");
-                } else {
-                    if (chdir(args[1]) != 0) {
-                        perror("Erro ao alterar diretório");
-                    }
+                    fprintf(stderr, "Uso: cd <directory>\n");
+                } else if (chdir(args[1]) != 0) {
+                    perror("Erro ao alterar diretório");     
                 }
             } else {
                 pid_t pid = fork();
